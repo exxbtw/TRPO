@@ -358,5 +358,5 @@ srotmg passed
 EDGE CASES
 zero length passed
 stride passed
-user@Macbook-Air OpenBLAS % 
+ 
 ---
