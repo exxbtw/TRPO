@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <cblas.h>
+#include <math.h>
 
 #include "trmm.h"
 
@@ -34,6 +35,8 @@ int main()
 
     printf("Matrix size %d x %d\n\n", N, N);
 
+    double geom = 1.0;
+
     for(int run = 0; run < 10; run++)
     {
         for(int i = 0; i < N*N; i++)
@@ -42,28 +45,33 @@ int main()
             B2[i] = B0[i];
         }
 
-
         double start = get_time();
 
-        dtrmm(0, 0, 0, 0, N, N, 1.0, A, N, B, N);
+        dtrmm(0,0,0,0,N,N,1.0,A,N,B,N);
 
         double end = get_time();
         double my_time = end - start;
 
         start = get_time();
 
-        cblas_dtrmm(CblasRowMajor, CblasLeft, CblasLower, CblasNoTrans, CblasNonUnit, N, N, 1.0, A, N, B2, N);
+        cblas_dtrmm(CblasRowMajor,CblasLeft,CblasLower,CblasNoTrans,CblasNonUnit,N,N,1.0,A,N,B2,N);
 
         end = get_time();
         double blas_time = end - start;
 
         double perf = (blas_time / my_time) * 100.0;
 
+        geom *= perf;
+
         printf("Run %d\n", run + 1);
         printf("my_trmm:    %f sec\n", my_time);
         printf("openblas:   %f sec\n", blas_time);
         printf("performance %.2f %%\n\n", perf);
     }
+
+    double geo_mean = pow(geom, 1.0/10.0);
+
+    printf("Average geometric performance: %.2f %%\n", geo_mean);
 
     free(A);
     free(B);
